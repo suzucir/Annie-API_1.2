@@ -4,6 +4,7 @@
 # Copyright Shigenori Suzuki <suzuki@appannie.com>
 #
 
+import sys
 import urllib2
 import datetime
 import simplejson as json
@@ -12,7 +13,16 @@ import simplejson as json
 def request_api(url, key, user_agent):
     headers = {'Authorization': key, 'User-Agent': user_agent}
     api_req = urllib2.Request(url, headers=headers)
-    api_response = urllib2.urlopen(api_req)
+    try:
+        api_response = urllib2.urlopen(api_req)
+    except urllib2.HTTPError as e:
+        error_msg = json.loads(e.read())
+        print "HTTP Error: ", e.code, e.msg
+        print "Reason: ", error_msg['error']
+        sys.exit()
+    except urllib2.URLError as e:
+        print "URL Error", e
+        sys.exit()
     api_response_body = json.loads(api_response.read())
     return api_response_body
 
@@ -25,22 +35,19 @@ def next_month(d):
 
 
 class Request:
-    """docstring for """
+    """ Class for API Request """
     def __init__(self):
         self.url = ""
         self.key = ""
         self.user_agent = ""
 
     def get_response(self, url, key, user_agent):
-        request_headers = {'Authorization': key, 'User-Agent': user_agent}
-        api_request = urllib2.Request(url, headers=request_headers)
-        api_open = urllib2.urlopen(api_request)
-        api_response = json.loads(api_open.read())
+        api_response = request_api(url, key, user_agent)
         return api_response
 
 
 class Exporter:
-    """docstring for """
+    """ Class for exporting data """
     def __init__(self):
         self.columns = ""
         self.filename = "default.tsv"
@@ -85,10 +92,53 @@ class Exporter:
                     data.append(str(i[j]))
                 elif isinstance(i[j], float):
                     data.append(str(i[j]))
+                elif isinstance(i[j], list):
+                    data.append(", ".join(i[j]))
                 else:
                     data.append(i[j])
             f.write(self.delimiter.join(data))
             f.write('\n')
+        f.close()
+
+    def to_tsv2(self):
+        f = open(self.filename, "a")
+        i = self.response[self.main_element]
+        if self.prefix_columns:
+            prefix_data = []
+            for j in self.prefix_columns:
+                if self.response[j] is None:
+                    prefix_data.append("")
+                elif isinstance(self.response[j], int):
+                    prefix_data.append(str(self.response[j]))
+                elif isinstance(self.response[j], float):
+                    prefix_data.append(str(self.response[j]))
+                else:
+                    prefix_data.append(self.response[j])
+            f.write(self.delimiter.join(prefix_data))
+            f.write(self.delimiter)
+
+        data = []
+        for j in self.columns:
+            if i[j] is None:
+                data.append("")
+            elif j == "description":
+                text = "\"" + str(i[j].encode('utf_8')
+                                      .replace('\n', '  ')
+                                      .replace('\r', ' ')
+                                      .replace('\t', ' ')
+                                      .replace('"', '\'')) + "\""
+                print text
+                data.append(text)
+            elif isinstance(i[j], int):
+                data.append(str(i[j]))
+            elif isinstance(i[j], float):
+                data.append(str(i[j]))
+            elif isinstance(i[j], list):
+                data.append(", ".join(i[j]))
+            else:
+                data.append(i[j])
+        f.write(self.delimiter.join(data))
+        f.write('\n')
         f.close()
 
     def print_json(self):
