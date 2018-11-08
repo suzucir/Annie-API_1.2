@@ -40,10 +40,10 @@ user_agent = settings.user_agent
 # Set up command line option for CUI using argparse
 # #######################################################################
 parser = argparse.ArgumentParser(
-    description='Retrieve App Annie Store Intelligence Top Apps data \
+    description='Retrieve App Annie Store Stats Top Apps data \
                  via App Annie API')
 parser.add_argument(
-    "-s", "--store", dest="opts_store", metavar="STORE", default="ios",
+    "-s", "--store", dest="opts_store", metavar="STORE", default="iphone",
     help="specify a type of device (Options	iphone | ipad | android)")
 parser.add_argument(
     "-c", "--country", dest="opts_country", metavar="CCODE", default="JP",
@@ -133,8 +133,7 @@ exporter.create_file()
 
 # Main
 while (end_date - run_date).days + 1 > 0:
-    request_url = url + "&start_date=" + run_date.strftime('%Y-%m-%d') + \
-                        "&end_date=" + run_date.strftime('%Y-%m-%d')
+    request_url = url + "&date=" + run_date.strftime('%Y-%m-%d') 
     print request_url
 
     # Retrieve a JSON response

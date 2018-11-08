@@ -49,7 +49,7 @@ user_agent = settings.user_agent
 # Set up command line option for CUI using argparse
 # #######################################################################
 parser = argparse.ArgumentParser(
-    description='Extracting App Annie Store Intelligence App History data \
+    description='Extract App Annie Usage Intelligence App History data \
                  via App Annie API')
 parser.add_argument(
     "-d", "--device", dest="opts_device", metavar="DEVICE", default="iphone",

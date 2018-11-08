@@ -87,4 +87,7 @@ ENV/
 
 # Rope project settings
 .ropeproject
+
+# Specific to this project
 result/
+*.txt

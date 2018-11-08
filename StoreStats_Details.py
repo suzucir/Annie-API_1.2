@@ -23,11 +23,15 @@ prefix_columns = ['code']
 response_main_element = 'product'
 
 # Need to set the exact same name as in API response
-columns = ['market', 'product_id', 'product_name',
+columns_ios = ['market', 'product_id', 'product_name',
            'publisher_id', 'publisher_name', 'release_date', 'size',
            'languages', 'main_category', 'other_categories', 'description'
            ]
 
+columns_gp = ['market', 'product_id', 'product_name',
+           'publisher_id', 'publisher_name', 'release_date', 'size',
+           'languages', 'main_category', 'other_categories', 'description', 'install_range'
+           ]
 
 # #######################################################################
 # Imported from settings.py
@@ -40,7 +44,7 @@ user_agent = settings.user_agent
 # Set up command line option for CUI using argparse
 # #######################################################################
 parser = argparse.ArgumentParser(
-    description='Extracting App Annie Store Intelligence App History data \
+    description='Extract App Annie Store Stats App Details \
                  via App Annie API')
 parser.add_argument(
     "-s", "--store", dest="opts_store", metavar="STORE", default="ios",
@@ -64,8 +68,10 @@ opts = parser.parse_args()
 product_id = opts.opts_id
 if opts.opts_store == "android":
     query_market = "google-play"
+    columns = columns_gp
 else:
     query_market = opts.opts_store
+    columns = columns_ios
 
 if "." in opts.opts_id:
     url = "https://api.appannie.com/v1.2/apps/" + query_market + \
@@ -81,7 +87,7 @@ url = "https://api.appannie.com/v1.2/apps/" + \
 
 
 # Create a result file
-filename = "result_StoreStat_Details_" + opts.opts_store + \
+filename = "result_StoreStats_Details_" + opts.opts_store + \
           "_" + str(product_id) + \
           ".tsv"
 
@@ -115,6 +121,6 @@ except:
 
 # Write data to the output file
 exporter.response = response
-exporter.to_tsv2()
+exporter.to_tsv_ss_details()
 
 sys.exit()

@@ -57,7 +57,7 @@ user_agent = settings.user_agent
 # Set up command line option for CUI using argparse
 # #######################################################################
 parser = argparse.ArgumentParser(
-    description='Extracting App Annie Audiecne Intelligence App Demographic \
+    description='Extract App Annie Audiecne Intelligence App Demographic \
                  data via App Annie API')
 parser.add_argument(
     "-s", "--store", dest="opts_store", metavar="STORE", default="ios",
